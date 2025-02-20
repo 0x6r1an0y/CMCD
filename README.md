@@ -18,3 +18,28 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 
 
 ## 硬體
+**PN532協議**
+|協議|指撥開關1|指撥開關2
+|:-:|:-:|:-:|
+|HSU|0|0|
+|I2C|1|0|
+|SPI|0|1|
+
+|元件|arduino nano接腳
+|:-:|:-:|
+|綠LED|D2|
+|藍LED|D4|
+|紅LED|D5|
+|按鈕|D8|
+|切換開關|D6|
+|蜂鳴器|D3|
+|PN532 SCK|D13|
+|PN532 MSO|D12|
+|PN532 MOSI|D11|
+|PN532 SS|D10|
+
+
+
+![image](https://github.com/user-attachments/assets/8a750df4-3939-4bb9-ada3-a8086b122dc8)
+##### 由wokwi設計
+
