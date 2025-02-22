@@ -28,9 +28,13 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
       
       read_id[讀卡] --> check_gen2_card{檢查是否為CUID卡}
       check_gen2_card{檢查是否為CUID卡} -- 否 --> 讀卡 --> check_gen1_card{檢查是否為UID卡}
-      check_gen1_card{檢查是否為UID卡} -- 否 --> 非UID、非CUID --> red[亮紅燈🔴]
+      check_gen1_card{檢查是否為UID卡} -- 否 --> 非UID非CUID --> red[亮紅燈🔴]
       check_gen2_card{檢查是否為CUID卡} -- 是 --> 為CUID卡 --> blue[亮藍燈🔵]
       check_gen1_card{檢查是否為UID卡} -- 是 --> 為UID卡 --> green[亮綠燈🟢]
+      green[亮綠燈🟢] --> code_end[程式結束]
+      blue[亮藍燈🔵] --> code_end[程式結束]
+      red[亮紅燈🔴] --> code_end[程式結束]
+      code_end[程式結束] --> input{SWITCH選擇左邊還是右邊}
       input{SWITCH選擇左邊還是右邊}-- 右邊 --> case_continue[連續偵測]
       --> stop[關閉電源]
 ```
