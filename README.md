@@ -41,6 +41,19 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
       check_same_id{檢查卡號是不是同一張} -- 否 -->  read_id[讀卡]
 ```
 
+#### UID 偵測實現邏輯
+
+1. 禁用 PN532 的自動 CRC 校驗，向PN532發送指令`0x63, 0x02, 0x00, 0x63, 0x03, 0x00`
+2. 向卡片發送 HALT 指令`0x50, 0x00, 0x57, 0xcd`
+3. 向PN532發送設定 BitFraming 為 7 位元的指令`0x63, 0x3d, 0x07`
+4. 向卡片發送第一個解鎖命令`0x40`
+5. 向PN532發送 BitFraming 恢復為正常模式的指令`0x63, 0x3d, 0x00`
+6. 向卡片發送第二個解鎖命令`0x43`
+7. 重新啟用 PN532 的自動 CRC 校驗，向PN532發送指令`0x63, 0x02, 0x80, 0x63, 0x03, 0x80`
+
+#### CUID 偵測實現邏輯
+
+
 ## 硬體
 ### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
 |協議|指撥開關1|指撥開關2
@@ -70,7 +83,10 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 |GND|GND|
 
 ## 已知問題
-CUID卡在連續模式下會撕裂
+1. CUID卡在連續模式下會撕裂
 
+## 名詞歧異
+1. UID可以指的是唯一識別字串 (Unique identifier)或是UID卡(chinese magic card gen 1)，為什麼要取UID這名字已不可考
 
-
+## 參考資料
+1. PN532 datasheet
