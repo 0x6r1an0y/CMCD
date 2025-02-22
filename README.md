@@ -12,7 +12,7 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 
 ### 使用自訂程式庫取代程式庫
 為什麼要動到原本的library?
-> 因為部分操作牽扯到底層function，大多都是private屬性，如果全部改成public也不太好，因此直接動library
+> 因為部分操作牽扯到底層api，大多都是private屬性，如果全部改成public也不太好，因此直接修改library
 
 程式庫雖然舊了一點點，但在我的實作中不影響
 1. 找到程式庫資料夾，在arduino ide的libary資料夾下，在我的例子中是"C:\Users\user\OneDrive\文件\Arduino\libraries\Adafruit_PN532"
@@ -54,10 +54,15 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 9. 向PN532發送重新啟用 PN532 的自動 CRC 校驗的指令`0x63, 0x02, 0x80, 0x63, 0x03, 0x80`
 10. 完成gen1後門啟用驗證
 
-完成上述流程若無報錯就可以確定是UID卡
+完成上述流程，若無報錯就可以確定是UID卡。
+題外話，android的nfc api就是沒有開放上面所以才沒辦法用android手機寫UID卡
 
 #### CUID 偵測實現邏輯
-
+1. 使用預設的keyA(FFFFFFFFFFFF)完成驗證
+2. 讀出block 0
+3. 寫入剛剛讀出的block 0
+4. 觀察`📄Adafruit_PN532.cpp`回傳的pn532_packetbuffer[7]和[8]，若成功寫入，應為0x00 0xEA。若寫入失敗，則為0x01 0xE9。
+   
 
 ## 硬體
 ### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
@@ -88,12 +93,12 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 |GND|GND|
 
 ## 已知問題
-1. CUID卡在連續模式下會撕裂
+1. CUID卡的實現邏輯畢竟是讀取再寫入，在連續模式下如果放在感應臨界邊緣處可能會寫入失敗導致撕裂，就算在過程中檢查卡號是不是同一張也無法降低損壞機率
+2. CUID卡要有寫入行為，才能知道卡號可不可以被變更，如果block 0無法用預設keyA解鎖，那就無法正確判斷是不是CUID卡了
 
 ## 名詞歧異
-1. UID可以指的是唯一識別字串 (Unique identifier)或是UID卡(chinese magic card gen 1)，為什麼要取UID這名字已不可考
+1. "UID"指的是唯一識別字串 (Unique identifier)或是UID卡(chinese magic card gen 1)，為什麼要取UID這名字已不可考。
 
 ## 參考資料
-1. PN532 datasheet: 
-2. gen1 backdoor card explain: https://stackoverflow.com/questions/41326384/re-writing-uid-and-block-0-on-chinese-supposed-to-be-writable-mifare-1k-card-i
-3. 
+1. PN532 datasheet: https://www.nxp.com/docs/en/nxp/data-sheets/PN532_C1.pdf
+2. gen1 backdoor unlock explain: https://stackoverflow.com/questions/41326384/re-writing-uid-and-block-0-on-chinese-supposed-to-be-writable-mifare-1k-card-i
