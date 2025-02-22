@@ -70,7 +70,7 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 
 ## 硬體
 ### 切換協議
-PN532上有一個小小的指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
+PN532上有一個小小的指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C也可以，HSU似乎程式庫尚未支援。
 |協議|指撥開關1|指撥開關2
 |:-:|:-:|:-:|
 |HSU|0|0|
