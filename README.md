@@ -18,6 +18,18 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 1. 找到程式庫資料夾，在arduino ide的libary資料夾下，在我的例子中是"C:\Users\user\OneDrive\文件\Arduino\libraries\Adafruit_PN532"
 2. 拿repo內的`📄Adafruit_PN532.h`和`📄Adafruit_PN532.cpp`取代原先資料夾內的
 
+### 程式邏輯
+```mermaid
+      graph LR
+      start[啟動電源] --> input[SWITCH選擇左邊還是右邊]
+      input[SWITCH選擇左邊還是右邊] -- 左邊 --> case_single[單次偵測] --> button[是否有按按鈕]
+      button[是否有按按鈕] -- 否 --> case_single[單次偵測]
+      button[是否有按按鈕] -- 是 --> read_id[read_id]
+      read_id[read_id] --> check_gen1_card[檢查是否為UID卡]
+      read_id[read_id] --> check_gen2_card[檢查是否為CUID卡]
+      input[SWITCH選擇左邊還是右邊] -- 右邊 --> case_continue[連續偵測]
+      --> stop[關閉電源]
+```
 
 ## 硬體
 ### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用最多線的SPI協議，用I²C或HSU也可以。
@@ -47,7 +59,8 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 |5V電源|VIN|
 |GND|GND|
 
-
+## 已知問題
+CUID卡在連續模式下會撕裂
 
 
 
