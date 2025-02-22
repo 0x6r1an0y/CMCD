@@ -21,18 +21,22 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 ### 程式邏輯
 ```mermaid
       graph LR
-      start[啟動電源] --> input[SWITCH選擇左邊還是右邊]
-      input[SWITCH選擇左邊還是右邊] -- 左邊 --> case_single[單次偵測] --> button[是否有按按鈕]
-      button[是否有按按鈕] -- 否 --> case_single[單次偵測]
-      button[是否有按按鈕] -- 是 --> read_id[read_id]
-      read_id[read_id] --> check_gen1_card[檢查是否為UID卡]
-      read_id[read_id] --> check_gen2_card[檢查是否為CUID卡]
-      input[SWITCH選擇左邊還是右邊] -- 右邊 --> case_continue[連續偵測]
+      start[啟動電源] --> 元件初始化 --> input{SWITCH選擇左邊還是右邊}
+      input{SWITCH選擇方向} -- 左邊 --> case_single[單次偵測] --> button{是否有按按鈕}
+      button{是否有按按鈕} -- 否 --> input{SWITCH選擇左邊還是右邊}
+      button{是否有按按鈕} -- 是 --> read_id[讀卡]
+      
+      read_id[讀卡] --> check_gen2_card{檢查是否為CUID卡}
+      check_gen2_card{檢查是否為CUID卡} -- 否 --> 讀卡 --> check_gen1_card{檢查是否為UID卡}
+      check_gen1_card{檢查是否為UID卡} -- 否 --> 非UID、非CUID --> red[亮紅燈🔴]
+      check_gen2_card{檢查是否為CUID卡} -- 是 --> 為CUID卡 --> blue[亮藍燈🔵]
+      check_gen1_card{檢查是否為UID卡} -- 是 --> 為UID卡 --> green[亮綠燈🟢]
+      input{SWITCH選擇左邊還是右邊}-- 右邊 --> case_continue[連續偵測]
       --> stop[關閉電源]
 ```
 
 ## 硬體
-### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用最多線的SPI協議，用I²C或HSU也可以。
+### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
 |協議|指撥開關1|指撥開關2
 |:-:|:-:|:-:|
 |HSU|0|0|
