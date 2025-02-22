@@ -1,5 +1,8 @@
 # chinese-magic-card-detector
 Using arduino and PN532 create a UID(chinese magic card gen 1) and CUID(chinese magic card gen 2) card detector. 
+
+用arduino和PN532做一個UID和CUID卡偵測器
+
 ## 軟體
 ### 前言
 這邊使用[SigmaDolphin的Adafruit-PN532分支](https://github.com/SigmaDolphin/Adafruit-PN532)，SigmaDolphin有提出PR但是一直未獲merge，其做了UID(gen 1)卡偵測的改動，新增了以下
@@ -52,30 +55,33 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 7. 向卡片發送第二個解鎖命令`0x43`
 8. 卡片會回傳`0x0a`(4 bits)，若沒有回傳，就不是UID卡
 9. 向PN532發送重新啟用 PN532 的自動 CRC 校驗的指令`0x63, 0x02, 0x80, 0x63, 0x03, 0x80`
-10. 完成gen1後門啟用驗證
+10. 完成gen1後門啟動
 
 完成上述流程，若無報錯就可以確定是UID卡。
-題外話，android的nfc api就是沒有開放上面所以才沒辦法用android手機寫UID卡
+> 題外話：軟體上，android的nfc api沒有開放設定BitFraming 為 7 位元，所以才沒辦法用android手機寫UID卡。硬體上，較舊的nfc晶片像是PN544在韌體上也沒有設定BitFraming的指令。
 
 #### CUID 偵測實現邏輯
 1. 使用預設的keyA(FFFFFFFFFFFF)完成驗證
 2. 讀出block 0
-3. 寫入剛剛讀出的block 0
+3. 寫回剛剛讀出的block 0
 4. 觀察`📄Adafruit_PN532.cpp`回傳的pn532_packetbuffer[7]和[8]，若成功寫入，應為0x00 0xEA。若寫入失敗，則為0x01 0xE9。
    
+> 題外話：本質上這就是去call write block api，只不過寫入的block是0，無須特殊自訂指令，所以才可以用android手機寫CUID卡。
 
 ## 硬體
-### PN532上有一個指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
+### 切換協議
+PN532上有一個小小的指撥開關，可以切換到不同協議，我這邊是使用~~最多線~~的SPI協議，用I²C或HSU也可以。
 |協議|指撥開關1|指撥開關2
 |:-:|:-:|:-:|
 |HSU|0|0|
 |I²C|1|0|
 |SPI|0|1|
 
-### 電路使用線上工具wokwi設計
+### 電路
+此圖使用線上工具wokwi設計
 
 ![image](https://github.com/user-attachments/assets/8a750df4-3939-4bb9-ada3-a8086b122dc8)
-pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
+pn532腳位由上到下分別為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 
 |元件|arduino nano接腳
 |:-:|:-:|
@@ -84,7 +90,7 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 |紅LED|D5|
 |按鈕|D8|
 |切換開關|D6|
-|蜂鳴器|D3|
+|蜂鳴器|D3(pwm)|
 |PN532 SCK|D13|
 |PN532 MSO|D12|
 |PN532 MOSI|D11|
@@ -93,7 +99,7 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 |GND|GND|
 
 ## 已知問題
-1. CUID卡的實現邏輯畢竟是讀取再寫入，在連續模式下如果放在感應臨界邊緣處可能會寫入失敗導致撕裂，就算在過程中檢查卡號是不是同一張也無法降低損壞機率
+1. CUID卡的實現邏輯畢竟是讀取再寫入，在連續模式下如果放在感應臨界邊緣處，可能會寫入失敗導致撕裂(也就是寫到壞卡)，就算在過程中檢查卡號是不是同一張也無法降低損壞機率，目前只能用單次模式偵測卡片
 2. CUID卡要有寫入行為，才能知道卡號可不可以被變更，如果block 0無法用預設keyA解鎖，那就無法正確判斷是不是CUID卡了
 
 ## 名詞歧異
@@ -102,3 +108,4 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 ## 參考資料
 1. PN532 datasheet: https://www.nxp.com/docs/en/nxp/data-sheets/PN532_C1.pdf
 2. gen1 backdoor unlock explain: https://stackoverflow.com/questions/41326384/re-writing-uid-and-block-0-on-chinese-supposed-to-be-writable-mifare-1k-card-i
+3. try to use android phone unlock the magic tag: https://stackoverflow.com/questions/15020940/unlock-mifare-tag-with-android
