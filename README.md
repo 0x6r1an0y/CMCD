@@ -64,7 +64,7 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 1. 使用預設的keyA(FFFFFFFFFFFF)完成驗證
 2. 讀出block 0
 3. 寫回剛剛讀出的block 0
-4. 觀察`📄Adafruit_PN532.cpp`回傳的pn532_packetbuffer[7]和[8]，若成功寫入，應為0x00 0xEA。若寫入失敗，則為0x01 0xE9。
+4. 觀察`📄Adafruit_PN532.cpp`回傳的`pn532_packetbuffer[7]`和`[8]`，若成功寫入，應為`0x00, 0xEA`。若寫入失敗，則為`0x01, 0xE9`。
    
 > 題外話：本質上這就是去call write block api，只不過寫入的block是0，無須特殊自訂指令，所以才可以用android手機寫CUID卡。
 
@@ -81,7 +81,7 @@ PN532上有一個小小的指撥開關，可以切換到不同協議，我這邊
 此圖使用線上工具wokwi設計
 
 ![image](https://github.com/user-attachments/assets/8a750df4-3939-4bb9-ada3-a8086b122dc8)
-pn532腳位由上到下分別為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
+pn532腳位由上到下分別為`RSTO`、`IRQ`、`GND`、`VCC`、`SS`、`MOSI`、`MSO`、`SCK`
 
 |元件|arduino nano接腳
 |:-:|:-:|
