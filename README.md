@@ -47,11 +47,14 @@ private function : `WriteRegister(uint8_t *reg, uint8_t len)`、`InCommunicateTh
 2. 向卡片發送 HALT 指令`0x50, 0x00, 0x57, 0xcd`
 3. 向PN532發送設定 BitFraming 為 7 位元的指令`0x63, 0x3d, 0x07`
 4. 向卡片發送第一個解鎖命令`0x40`(7 bits)
-5. 卡片會回傳`a`(4 bits)
+5. 卡片會回傳`0x0a`(4 bits)，若沒有回傳，就不是UID卡
 6. 向PN532發送 BitFraming 恢復為正常模式的指令`0x63, 0x3d, 0x00`
 7. 向卡片發送第二個解鎖命令`0x43`
-8. 卡片會回傳`0a`
+8. 卡片會回傳`0x0a`(4 bits)，若沒有回傳，就不是UID卡
 9. 向PN532發送重新啟用 PN532 的自動 CRC 校驗的指令`0x63, 0x02, 0x80, 0x63, 0x03, 0x80`
+10. 完成gen1後門啟用驗證
+
+完成上述流程若無報錯就可以確定是UID卡
 
 #### CUID 偵測實現邏輯
 
@@ -91,4 +94,6 @@ pn532由上到下為RSTO、IRQ、GND、VCC、SS、MOSI、MSO、SCK
 1. UID可以指的是唯一識別字串 (Unique identifier)或是UID卡(chinese magic card gen 1)，為什麼要取UID這名字已不可考
 
 ## 參考資料
-1. PN532 datasheet
+1. PN532 datasheet: 
+2. gen1 backdoor card explain: https://stackoverflow.com/questions/41326384/re-writing-uid-and-block-0-on-chinese-supposed-to-be-writable-mifare-1k-card-i
+3. 
