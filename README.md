@@ -1,7 +1,7 @@
 # chinese-magic-card-detector
 Using arduino and PN532 create a UID(chinese magic card gen 1) and CUID(chinese magic card gen 2) card detector. 
 
-用arduino和PN532做一個UID和CUID卡偵測器
+用arduino和PN532做一個UID和CUID卡偵測器(侵入式)
 
 ## 軟體
 ### 前言
